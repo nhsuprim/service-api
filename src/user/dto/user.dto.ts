@@ -1,34 +1,44 @@
 import {
-  IsEmail,
-  IsMongoId,
-  IsNotEmpty,
-  IsNumber,
-  IsString,
-} from 'class-validator';
+    IsEmail,
+    IsMongoId,
+    IsNotEmpty,
+    IsNumber,
+    IsString,
+} from "class-validator";
 
 export class UserDto {
-  @IsString()
-  @IsNotEmpty()
-  name: string;
+    @IsString()
+    @IsNotEmpty()
+    username: string;
 
-  @IsNotEmpty()
-  @IsString()
-  @IsEmail()
-  email: string;
+    @IsNotEmpty()
+    @IsString()
+    @IsEmail()
+    email: string;
 
-  @IsNotEmpty()
-  @IsString()
-  password: string;
+    @IsNotEmpty()
+    @IsString()
+    password: string;
 
-  createdAt: Date;
-  updatedAt: Date;
+    createdAt: Date;
+    updatedAt: Date;
+}
+export class UserLoginDto {
+    @IsNotEmpty()
+    @IsString()
+    @IsEmail()
+    email: string;
+
+    @IsNotEmpty()
+    @IsString()
+    password: string;
 }
 
 export class UserRo {
-  id: string;
-  name: string;
-  email: string;
-  password: string;
-  createdAt: Date;
-  updatedAt: Date;
+    id: string;
+    username: string;
+    email: string;
+    password: string;
+    createdAt: Date;
+    updatedAt: Date;
 }

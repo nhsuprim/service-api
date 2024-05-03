@@ -1,3 +1,4 @@
+import * as bcrypt from "bcrypt";
 import { UserDocument } from "../schemas/user.schemas";
 import {
     ConflictException,
@@ -7,7 +8,7 @@ import {
 import { InjectModel } from "@nestjs/mongoose";
 import { User } from "../schemas/user.schemas";
 import { Model } from "mongoose";
-import { UserDto, UserRo } from "../dto/user.dto";
+import { UserDto, UserLoginDto, UserRo } from "../dto/user.dto";
 
 @Injectable()
 export class UserService {
@@ -15,8 +16,6 @@ export class UserService {
         @InjectModel(User.name)
         private userModel: Model<User>
     ) {}
-
-    // create a new user
 
     async create(dto: UserDto): Promise<UserRo> {
         try {
@@ -30,14 +29,63 @@ export class UserService {
                 );
             }
 
+            const hashedPassword = await bcrypt.hash(dto.password, 5);
+            console.log(hashedPassword);
+
             // Create a new user if email doesn't exist
-            const newUser = await this.userModel.create(dto);
+            const newUser = await this.userModel.create({
+                ...dto,
+                password: hashedPassword,
+            });
             return await this.formatUser(newUser);
         } catch (error) {
             if (error instanceof ConflictException) {
                 throw error; // Rethrow ConflictException
             }
             throw new NotFoundException("User creation failed");
+        }
+    }
+
+    //login user
+    async login(dto: UserLoginDto): Promise<UserRo> {
+        try {
+            // Check if the email already exists
+            const existingUser = await this.userModel
+                .findOne({ email: dto.email })
+                .exec();
+            if (!existingUser) {
+                throw new ConflictException(
+                    "User with this email does not exist"
+                );
+            }
+
+            // Check if the password is correct
+            const isPasswordCorrect = await bcrypt.compare(
+                dto.password,
+                existingUser.password
+            );
+            if (!isPasswordCorrect) {
+                throw new ConflictException("Password is incorrect");
+            }
+
+            return await this.formatUser(existingUser);
+        } catch (error) {
+            if (error instanceof ConflictException) {
+                throw error; // Rethrow ConflictException
+            }
+            throw new NotFoundException("User creation failed");
+        }
+    }
+    // find by email
+    async findByEmail(email: string): Promise<UserRo> {
+        try {
+            const user = await this.userModel.findOne({ email: email }).exec();
+            if (!user) {
+                throw new NotFoundException("User not found");
+            }
+            return this.formatUser(user);
+        } catch (error) {
+            throw new NotFoundException("Failed to retrieve user");
         }
     }
 
@@ -96,12 +144,12 @@ export class UserService {
     }
 
     async formatUser(userDocument: UserDocument): Promise<UserRo> {
-        const { _id, name, email, password, createdAt, updatedAt } =
+        const { _id, username, email, password, createdAt, updatedAt } =
             userDocument;
 
         return {
             id: _id,
-            name,
+            username,
             email,
             password,
             createdAt,

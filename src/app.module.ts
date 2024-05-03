@@ -2,14 +2,14 @@ import { Logger, Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import mongoose from "mongoose";
 import { UserModule } from "./user/user.module";
-import { AuthModule } from "./auth/auth.module";
+// import { AuthModule } from "./auth/auth.module";
 require("dotenv").config();
 
 @Module({
     imports: [
         MongooseModule.forRoot(process.env.MONGODB_URI),
         UserModule,
-        AuthModule,
+        // AuthModule,
     ],
     controllers: [],
     providers: [],

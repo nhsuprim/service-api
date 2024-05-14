@@ -3,6 +3,7 @@ import {
     IsMongoId,
     IsNotEmpty,
     IsNumber,
+    IsOptional,
     IsString,
 } from "class-validator";
 
@@ -19,9 +20,6 @@ export class UserDto {
     @IsNotEmpty()
     @IsString()
     password: string;
-
-    createdAt: Date;
-    updatedAt: Date;
 }
 export class UserLoginDto {
     @IsNotEmpty()
@@ -32,6 +30,12 @@ export class UserLoginDto {
     @IsNotEmpty()
     @IsString()
     password: string;
+}
+
+export class UserShortDetailsDto {
+    username: string;
+    email: string;
+    id: string;
 }
 
 export class UserRo {

@@ -7,15 +7,13 @@ import {
     Param,
     Patch,
     Post,
-    UseGuards,
-    UsePipes,
-    ValidationPipe,
 } from "@nestjs/common";
 import { UserService } from "../services/user.service";
 import { UserDto, UserLoginDto, UserRo } from "../dto/user.dto";
 import { CommonResponse } from "src/@common/dto/common-response.dto";
 import { LocalGuard } from "src/auth/guards/local.guard";
 import { JwtAuthGuard } from "src/auth/guards/jwt.guard";
+import { FileInterceptor } from "@nestjs/platform-express";
 
 @Controller("users")
 export class UserController {
@@ -23,7 +21,6 @@ export class UserController {
 
     //post user
     @Post()
-    // @UsePipes(new ValidationPipe())
     async create(@Body() dto: UserDto): Promise<CommonResponse<UserRo>> {
         const data = await this.userService.create(dto);
         return {
@@ -61,15 +58,6 @@ export class UserController {
             message: [""],
             data,
         };
-    }
-    @Get(":email")
-    async findByEmail(@Param("email") email: string) {
-        try {
-            const user = await this.userService.findByEmail(email);
-            return user;
-        } catch (error) {
-            throw new NotFoundException("User not found");
-        }
     }
 
     @Patch(":id")

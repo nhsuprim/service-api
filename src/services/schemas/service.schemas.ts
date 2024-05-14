@@ -24,7 +24,7 @@ export class Services extends BaseSchema {
         ref: "UserDetails",
         required: true,
     })
-    userDetails: UserDetails;
+    userId: UserDetails;
 
     // @Prop({ type: Date, default: Date.now })
     // createdAt: Date;

@@ -31,7 +31,7 @@ export class ServiceDto {
     @IsString()
     @IsMongoId()
     @IsNotEmpty()
-    userDetails: string;
+    userId: string;
 }
 
 export class ServiceRo {
@@ -41,7 +41,7 @@ export class ServiceRo {
     discription: string;
     price: number;
     image: string;
-    userDetails: UserDetailsRo;
+    userId: UserDetailsRo;
     createdAt: Date;
     updatedAt: Date;
 }

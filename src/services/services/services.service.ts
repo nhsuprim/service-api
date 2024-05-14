@@ -17,16 +17,15 @@ export class Servicesinfo {
     async create(dto: ServiceDto): Promise<ServiceRo> {
         // Check if the email already exists
         try {
-            const {
-                serviceName,
-                category,
-                price,
-                discription,
-                image,
-                userDetails,
-            } = dto;
+            const { serviceName, category, price, discription, image, userId } =
+                dto;
 
-            const userInfo = await this.userDetails.findById(userDetails);
+            const findUserDetails =
+                await this.userDetails.findUserDetailsByEmail(userId);
+
+            const userInfo = await this.userDetails.findById(
+                findUserDetails.id
+            );
 
             const NewService = await this.serviceModel.create({
                 serviceName,
@@ -34,7 +33,7 @@ export class Servicesinfo {
                 price,
                 discription,
                 image,
-                userDetails: userInfo.id,
+                userId: userInfo.id,
             });
             return this.formatedService(NewService);
         } catch (error) {
@@ -73,8 +72,7 @@ export class Servicesinfo {
 
         const findServices = services.filter(
             (service) =>
-                service.userDetails._id.toString() ===
-                findUserDetails.id.toString()
+                service.userId._id.toString() === findUserDetails.id.toString()
         );
 
         return Promise.all(
@@ -82,18 +80,46 @@ export class Servicesinfo {
         );
     }
 
+    //update service
+    async update(id: string, dto: ServiceDto): Promise<ServiceRo> {
+        try {
+            const service = await this.serviceModel.findById(id).exec();
+            if (!service) {
+                throw new NotFoundException("Service not found");
+            }
+
+            const updatedService = await this.serviceModel
+                .findByIdAndUpdate(id, dto, { new: true })
+                .exec();
+
+            return this.formatedService(updatedService);
+        } catch (error) {
+            throw new NotFoundException("Failed to update service");
+        }
+    }
+
+    //delete service
+    async delete(id: string): Promise<ServiceRo> {
+        try {
+            const service = await this.serviceModel.findById(id).exec();
+            if (!service) {
+                throw new NotFoundException("Service not found");
+            }
+            const deletedService = await this.serviceModel
+                .findByIdAndDelete(id)
+                .exec();
+            return this.formatedService(deletedService);
+        } catch (error) {
+            throw new NotFoundException("Failed to delete service");
+        }
+    }
+
     async formatedService(
         serviceDocument: ServicesDocument
     ): Promise<ServiceRo> {
-        const {
-            serviceName,
-            category,
-            price,
-            discription,
-            image,
-            userDetails,
-        } = serviceDocument;
-        const userInfo = await this.userDetails.findById(userDetails._id);
+        const { serviceName, category, price, discription, image, userId } =
+            serviceDocument;
+        const userInfo = await this.userDetails.findById(userId._id);
         return {
             id: serviceDocument._id,
             serviceName: serviceDocument.serviceName,
@@ -101,7 +127,7 @@ export class Servicesinfo {
             discription: serviceDocument.discription,
             price: serviceDocument.price,
             image: serviceDocument.image,
-            userDetails: userInfo,
+            userId: userInfo,
             createdAt: serviceDocument.createdAt,
             updatedAt: serviceDocument.updatedAt,
         };

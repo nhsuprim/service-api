@@ -40,9 +40,13 @@ export class Servicesinfo {
             throw new NotFoundException("User not found");
         }
     }
-    async findAll(): Promise<ServiceRo[]> {
+    async findAll(userId?: string): Promise<ServiceRo[]> {
         try {
-            const services = await this.serviceModel.find().exec();
+            const conditions: any = {};
+            if (userId) {
+                conditions.userId = userId;
+            }
+            const services = await this.serviceModel.find(conditions).exec();
             return Promise.all(
                 services.map((service) => this.formatedService(service))
             );
@@ -83,13 +87,34 @@ export class Servicesinfo {
     //update service
     async update(id: string, dto: ServiceDto): Promise<ServiceRo> {
         try {
+            const { serviceName, category, price, discription, image, userId } =
+                dto;
+
+            const findUserDetails =
+                await this.userDetails.findUserDetailsByEmail(userId);
+
+            const userInfo = await this.userDetails.findById(
+                findUserDetails.id
+            );
+
             const service = await this.serviceModel.findById(id).exec();
             if (!service) {
                 throw new NotFoundException("Service not found");
             }
 
             const updatedService = await this.serviceModel
-                .findByIdAndUpdate(id, dto, { new: true })
+                .findByIdAndUpdate(
+                    id,
+                    {
+                        serviceName: serviceName,
+                        category: category,
+                        price: price,
+                        discription: discription,
+                        image: image,
+                        userId: userInfo.id,
+                    },
+                    { new: true }
+                )
                 .exec();
 
             return this.formatedService(updatedService);

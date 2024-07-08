@@ -5,6 +5,7 @@ import { UserModule } from "./user/user.module";
 import { UserDetailsModule } from "./userDetails/userDetails.module";
 import { ServiceModule } from "./services/services.module";
 import { OrdersModule } from "./order/order.module";
+import { RequestServicesModule } from "./requestService/requestServices.module";
 // import { AuthModule } from "./auth/auth.module";
 require("dotenv").config();
 
@@ -15,6 +16,7 @@ require("dotenv").config();
         UserDetailsModule,
         ServiceModule,
         OrdersModule,
+        RequestServicesModule,
         // AuthModule,
     ],
     controllers: [],

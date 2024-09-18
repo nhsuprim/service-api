@@ -11,7 +11,7 @@ require("dotenv").config();
 
 @Module({
     imports: [
-        MongooseModule.forRoot(process.env.MONGODB_URI),
+        MongooseModule.forRoot(process.env.MONGO_URI),
         UserModule,
         UserDetailsModule,
         ServiceModule,
